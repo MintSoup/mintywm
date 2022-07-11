@@ -52,18 +52,17 @@ PANGOLIB = `pkg-config --libs xft pango pangoxft`
 #IMLIB2LIBS = -lImlib2
 
 # includes and libs
-INCS = -I${X11INC} -I${FREETYPEINC} ${YAJLINC} ${PANGOINC}
+INCS = -I${X11INC} -I${FREETYPEINC} ${YAJLINC} ${PANGOINC} -I inc
 LIBS = -L${X11LIB} -lX11 ${XINERAMALIBS} ${FREETYPELIBS}  ${XRENDER} ${MPDCLIENT} ${XEXTLIB} ${XCBLIBS} ${KVMLIB} ${PANGOLIB} ${YAJLLIBS} ${IMLIB2LIBS}
 
 # flags
 CPPFLAGS = -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_POSIX_C_SOURCE=200809L -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
 #CFLAGS   = -g -std=c99 -pedantic -Wall -O0 ${INCS} ${CPPFLAGS}
-CFLAGS   = -std=c99 -pedantic -Wall -Wno-unused-function -Wno-deprecated-declarations -Os ${INCS} ${CPPFLAGS}
+
+CFLAGS       = -std=c99 -pedantic -Wall -Wno-unused-function -Wno-deprecated-declarations -O2 ${INCS} ${CPPFLAGS}
+DEBUGFLAGS   = -std=c99 -pedantic -Wall -Wno-unused-function -Wno-deprecated-declarations -O0 -g ${INCS} ${CPPFLAGS}
 LDFLAGS  = ${LIBS}
 
 # Solaris
 #CFLAGS = -fast ${INCS} -DVERSION=\"${VERSION}\"
 #LDFLAGS = ${LIBS}
-
-# compiler and linker
-CC = cc

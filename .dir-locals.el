@@ -1,0 +1,6 @@
+((nil . ((compile-command . "make -j12")
+		 (projectile-project-compilation-cmd . "make -j12")
+		 (projectile-project-debug-cmd . "make -j12 debug")
+		 (+debug-function . projectile-run-gdb)
+		 (+run-function . (lambda ()
+							  (async-shell-command "make run"))))))

@@ -6,7 +6,7 @@
  * events about window (dis-)appearance. Only one X connection at a time is
  * allowed to select for this event mask.
  *
- * The event handlers of dwm are organized in an array which is accessed
+ * The event handlers of mintywm are organized in an array which is accessed
  * whenever a new event has been fetched. This allows event dispatching
  * in O(1) time.
  *
@@ -46,7 +46,6 @@
 
 
 #include <pango/pango.h>
-
 
 
 /* macros */
@@ -353,7 +352,7 @@ static void zoom(const Arg *arg);
 
 /* bar functions */
 
-#include "patch/include.h"
+#include "../patch/include.h"
 
 /* variables */
 static const char broken[] = "broken";
@@ -398,9 +397,9 @@ static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
 
 /* configuration, allows nested code to access above variables */
-#include "config.h"
+#include "../config.h"
 
-#include "patch/include.c"
+#include "../patch/include.c"
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[NUMTAGS > 31 ? -1 : 1]; };
@@ -723,7 +722,7 @@ clientmessage(XEvent *e)
 			updatesystrayicongeom(c, wa.width, wa.height);
 			XAddToSaveSet(dpy, c->win);
 			XSelectInput(dpy, c->win, StructureNotifyMask | PropertyChangeMask | ResizeRedirectMask);
-			XClassHint ch = {"dwmsystray", "dwmsystray"};
+			XClassHint ch = {"mintywmsystray", "mintywmsystray"};
 			XSetClassHint(dpy, c->win, &ch);
 			XReparentWindow(dpy, c->win, systray->win, 0, 0);
 			/* use parents background color */
@@ -962,7 +961,7 @@ void
 drawbar(Monitor *m)
 {
 	Bar *bar;
-	
+
 	if (m->showbar)
 		for (bar = m->bar; bar; bar = bar->next)
 			drawbarwin(bar);
@@ -2015,7 +2014,7 @@ setup(void)
 	XChangeProperty(dpy, wmcheckwin, netatom[NetWMCheck], XA_WINDOW, 32,
 		PropModeReplace, (unsigned char *) &wmcheckwin, 1);
 	XChangeProperty(dpy, wmcheckwin, netatom[NetWMName], utf8string, 8,
-		PropModeReplace, (unsigned char *) "dwm", 3);
+		PropModeReplace, (unsigned char *) "mintywm", 3);
 	XChangeProperty(dpy, root, netatom[NetWMCheck], XA_WINDOW, 32,
 		PropModeReplace, (unsigned char *) &wmcheckwin, 1);
 	/* EWMH support per view */
@@ -2084,9 +2083,6 @@ sigchld(int unused)
 void
 spawn(const Arg *arg)
 {
-	if (arg->v == dmenucmd)
-		dmenumon[0] = '0' + selmon->num;
-
 	if (fork() == 0)
 	{
 		if (dpy)
@@ -2094,7 +2090,7 @@ spawn(const Arg *arg)
 
 		setsid();
 		execvp(((char **)arg->v)[0], (char **)arg->v);
-		fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
+		fprintf(stderr, "mintywm: execvp %s", ((char **)arg->v)[0]);
 		perror(" failed");
 		exit(EXIT_SUCCESS);
 	}
@@ -2266,7 +2262,7 @@ updatebars(void)
 		.colormap = cmap,
 		.event_mask = ButtonPressMask|ExposureMask
 	};
-	XClassHint ch = {"dwm", "dwm"};
+	XClassHint ch = {"mintywm", "mintywm"};
 	for (m = mons; m; m = m->next) {
 		for (bar = m->bar; bar; bar = bar->next) {
 			if (bar->external)
@@ -2474,8 +2470,10 @@ void
 updatestatus(void)
 {
 	Monitor *m;
+
 	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-		strcpy(stext, "dwm-"VERSION);
+		strcpy(stext, "mintywm-"VERSION);
+
 	for (m = mons; m; m = m->next)
 		drawbar(m);
 }
@@ -2579,7 +2577,7 @@ xerror(Display *dpy, XErrorEvent *ee)
 	|| (ee->request_code == X_GrabKey && ee->error_code == BadAccess)
 	|| (ee->request_code == X_CopyArea && ee->error_code == BadDrawable))
 		return 0;
-	fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n",
+	fprintf(stderr, "mintywm: fatal error: request code=%d, error code=%d\n",
 		ee->request_code, ee->error_code);
 	return xerrorxlib(dpy, ee); /* may call exit */
 }
@@ -2595,7 +2593,7 @@ xerrordummy(Display *dpy, XErrorEvent *ee)
 int
 xerrorstart(Display *dpy, XErrorEvent *ee)
 {
-	die("dwm: another window manager is already running");
+	die("mintywm: another window manager is already running");
 	return -1;
 }
 
@@ -2625,13 +2623,13 @@ int
 main(int argc, char *argv[])
 {
 	if (argc == 2 && !strcmp("-v", argv[1]))
-		die("dwm-"VERSION);
+		die("mintywm-"VERSION);
 	else if (argc != 1)
-		die("usage: dwm [-v]");
+		die("usage: mintywm [-v]");
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
 	if (!(dpy = XOpenDisplay(NULL)))
-		die("dwm: cannot open display");
+		die("mintywm: cannot open display");
 	checkotherwm();
 	setup();
 #ifdef __OpenBSD__
@@ -2644,4 +2642,3 @@ main(int argc, char *argv[])
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
 }
-
