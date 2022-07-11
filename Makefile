@@ -11,7 +11,7 @@ OBJ := $(patsubst src/%,obj/%,$(OBJ))
 
 build: mintywm
 
-obj/%.o: src/%.c
+obj/%.o: src/%.c config.h
 	mkdir -p obj
 	$(CC) $(CFLAGS) -c -o $@ $<
 
