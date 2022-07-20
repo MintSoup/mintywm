@@ -1,0 +1,41 @@
+#+TITLE: MintyWM: A dwm clone configurable in Guile
+
+* Intro
+MintyWM is a dynamic X11 window manager. Conceptually, it is dwm with Guile support, allowing you to script and configure your window manager with a high-level, clean and powerful programming language.
+
+* Features
++ Dynamic tiling
++ Status bar configurable in Scheme
++ Scheme REPL, allowing you to reconfigure the WM on the fly without recompiling or even restarting
++ (Coming soon) Configure keybinds, themes and everything else without touching config.h
++ (Coming soon) Client program for running arbitrary Scheme code
+  
+* Documentation and getting started
+Coming soo  n
+
+* Motivation
+** Why?
+I personally really like the way dwm manages windows, but I have four main issues with it:
+1. You have to recompile it every time you want to make any change. It's not a dealbreaker but it gets annoying, especially compared to lispy programs where you can just re-evaluate and instantly see the changes appear.
+2. C is a very low-level language, and while that makes it fast, writing more complex features takes lots of time and lines of code.
+3. dwm's project structure is absolutely crazy. Hell, you can't even use a language server on the damn thing because of all the ~#include~ s and other nonstandard, unnecessary stuff. Patching a single 3000 line source file is clunky and excessively minimalistic, to the point where the its annoyances outweigh the benefits.
+4. The way dwm manages its status bar is deranged. I don't understand how suckless devs of all people consider it acceptable to run 15 bash scripts and spawn a new process every second just to have a little bit of text in the status bar.
+
+This project aims to fix all these issues and create my perfect window manager.
+
+*** Why not Awesome?
+Awesome is a fine window manager and I am actually using it right now. Overall, the idea of Awesome is great but the development has really stagnated and there are many annoying bugs in the code. I would have continued using it if it weren't for the handful of rough corners.
+
+** Why Guile?
+I chose Guile for the scripting language because it is a rare example of a good implementation of a well-designed language. It's expressive, high level, and very interactive/dynamic. Having a REPL is a godsend while you're tweaking small things because at no point do you have to reload (or recompile the program).
+** Why dwm?
+Initially, I wanted to write the entire WM in pure Guile, but chose to fork dwm for a few reasons:
+1. dwm provides a solid base and stops me from having to reinvent the wheel a bunch of times.
+2. Using dwm as a base allows me to rewrite features in Guile one at a time while always having a functioning WM.
+3. I couldn't get guile-xcb to work 🤷 
+  
+* Design and Philosophy
++ Keep the project structure simple and standard. Avoid ~#include~-ing C files (my god) or doing anything fishy.
++ Be as flexible as possible without going the AwesomeWM route of being able to emulate every other window manager in existence.
++ If a feature can be implemented in Guile, it should be implemented in Guile.
++ Complexity is not inherently bad: if a highly beneficial change requires us to introduce a little complexity, so be it.
