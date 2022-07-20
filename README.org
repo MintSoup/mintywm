@@ -1,6 +1,5 @@
 #+TITLE: MintyWM: A dwm clone configurable in Guile
 
-* Intro
 MintyWM is a dynamic X11 window manager. Conceptually, it is dwm with Guile support, allowing you to script and configure your window manager with a high-level, clean and powerful programming language.
 
 * Features
