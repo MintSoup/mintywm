@@ -12,10 +12,33 @@
 ;; You should have received a copy of the GNU General Public License along with
 ;; mintywm. If not, see <https://www.gnu.org/licenses/>.
 
+;; Commentary
+
+;; This module is used to convert our custom SXML based markup tree format
+;; into pango markup SXML, which can later be converted to pango markup using
+;; sxml->xml.
+
+;; Code
+
 (define-module (mintywm markup)
 	#:use-module (ice-9 match))
 
 (define-public (format-to-sxml . tree)
+	"Convert our custom markup format to pango markup SXML.
+
+Example usage:
+
+Bold red text \"hello\":
+    (format-to-sxml '(b (fg \"red\" \"hello\")))
+
+Underlined text:
+    (format-to-sxml '(u \"hello\"))
+
+Italic text with #51afef as its fg and black as its bg color:
+    (format-to-sxml '(it (fg \"#51afef\" (bg \"black\" hello))))
+
+For more examples, check out the source code.
+"
 	(match tree
 		[(('b rest ...))
 		 `(span (@ (weight "bold")) ,(apply format-to-sxml rest))]
