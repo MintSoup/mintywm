@@ -29,6 +29,7 @@
 #include "../patch/include.h"
 #include <X11/Xlib.h>
 #include <X11/extensions/render.h>
+#include <semaphore.h>
 
 /* variables */
 static const char broken[] = "broken";
@@ -44,10 +45,11 @@ static int lrpad;  /* sum of left and right padding for text */
  * windows from one monitor to another. This variable is used internally to
  * ignore such configure requests while movemouse or resizemouse are being used.
  */
-static int ignoreconfigurerequests = 0;
-static int (*xerrorxlib)(Display *, XErrorEvent *);
-static unsigned int numlockmask = 0;
-static void (*handler[LASTEvent])(XEvent *) = {
+int ignoreconfigurerequests = 0;
+int (*xerrorxlib)(Display *, XErrorEvent *);
+unsigned int numlockmask = 0;
+// clang-format off
+void (*handler[LASTEvent])(XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ClientMessage] = clientmessage,
 	[ConfigureRequest] = configurerequest,
@@ -62,16 +64,18 @@ static void (*handler[LASTEvent])(XEvent *) = {
 	[MotionNotify] = motionnotify,
 	[PropertyNotify] = propertynotify,
 	[ResizeRequest] = resizerequest,
-	[UnmapNotify] = unmapnotify};
-static Atom wmatom[WMLast], netatom[NetLast];
+	[UnmapNotify] = unmapnotify
+};
+// clang-format on
+Atom wmatom[WMLast], netatom[NetLast];
 static Atom xatom[XLast];
-static int running = 1;
-static Cur *cursor[CurLast];
-static Clr **scheme;
-static Display *dpy;
-static Drw *drw;
-static Monitor *mons, *selmon;
-static Window root, wmcheckwin;
+int running = 1;
+Cur *cursor[CurLast];
+Clr **scheme;
+Display *dpy;
+Drw *drw;
+Monitor *mons, *selmon;
+Window root, wmcheckwin;
 
 /* configuration, allows nested code to access above variables */
 #include "../config.h"
@@ -625,7 +629,10 @@ void drawbars(void) {
 		drawbar(m);
 }
 
+sem_t dbw;
+
 void drawbarwin(Bar *bar) {
+	sem_wait(&dbw);
 	if (!bar || !bar->win || bar->external)
 		return;
 	int r, w, total_drawn = 0;
@@ -747,6 +754,8 @@ void drawbarwin(Bar *bar) {
 		arrange(bar->mon);
 	} else
 		drw_map(drw, bar->win, 0, 0, bar->bw, bar->bh);
+
+	sem_post(&dbw);
 }
 
 void enternotify(XEvent *e) {
@@ -1564,6 +1573,9 @@ void setup(void) {
 	 * people */
 	putenv("_JAVA_AWT_WM_NONREPARENTING=1");
 
+	/* init semaphores */
+	sem_init(&dbw, 0, 1);
+
 	/* init screen */
 	screen = DefaultScreen(dpy);
 	sw = DisplayWidth(dpy, screen);
@@ -1617,9 +1629,6 @@ void setup(void) {
 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
 
-	/* init guile */
-	pthread_create(&guile_thread, NULL, init_guile, NULL);
-
 	/* init appearance */
 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
 	for (i = 0; i < LENGTH(colors); i++)
@@ -1653,6 +1662,9 @@ void setup(void) {
 	XSelectInput(dpy, root, wa.event_mask);
 	grabkeys();
 	focus(NULL);
+
+	/* init guile */
+	pthread_create(&guile_thread, NULL, init_guile, NULL);
 }
 
 void seturgent(Client *c, int urg) {

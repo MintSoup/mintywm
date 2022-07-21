@@ -16,36 +16,32 @@ mintywm. If not, see <https://www.gnu.org/licenses/>.
 
 #include "dwm.h"
 #include "guileintg.h"
-#include <libguile/eval.h>
-#include <libguile/modules.h>
-#include <libguile/strings.h>
-#include <libguile/strports.h>
-#include <libguile/threads.h>
+#include <libguile.h>
 
 static SCM set_title(SCM str) {
 #define FUNC_NAME "set-title"
 	if (!scm_is_string(str)) {
 		SCM_MISC_ERROR("arg must be a string", SCM_EOL);
 	}
-	int n = scm_to_locale_stringbuf(str, stext, sizeof(stext));
+	int n = scm_to_locale_stringbuf(str, stext, sizeof(stext) - 1);
 	if (n < sizeof(stext))
 		stext[n] = 0;
 	updatestatus();
 	return SCM_UNSPECIFIED;
 }
 
-static void register_primitives(void *args) {
+static void register_core(void *args) {
 	scm_c_define_gsubr("set-title", 1, 0, 0, &set_title);
 	scm_c_export("set-title");
+
+	scm_primitive_load(scm_from_locale_string("guile/core.scm"));
 }
 
 static void *init(void *data) {
-	scm_c_define_module("mintywm core", register_primitives, NULL);
-	scm_c_define("core-modules-path", scm_from_locale_string("guile/"));
-	scm_c_eval_string("(add-to-load-path core-modules-path)");
+	SCM mod = scm_c_define_module("mintywm core", register_core, NULL);
 
-	scm_primitive_load(scm_from_locale_string("guile/usercfg.scm"));
-
+	scm_c_eval_string_in_module("(load-user-config-file \"init.scm\")",
+								mod);
 	return NULL;
 }
 

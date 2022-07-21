@@ -26,39 +26,36 @@ extern char stext[1024];
 #include "drw.h"
 #include "util.h"
 
-
 #include <pango/pango.h>
 
-
 /* macros */
-#define Button6                 6
-#define Button7                 7
-#define Button8                 8
-#define Button9                 9
-#define NUMTAGS                 9
-#define BARRULES                20
-#define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
-#define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask) & (ShiftMask|ControlMask|Mod1Mask|Mod2Mask|Mod3Mask|Mod4Mask|Mod5Mask))
-#define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
-                               * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
-#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
-#define LENGTH(X)               (sizeof X / sizeof X[0])
-#define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
-#define WIDTH(X)                ((X)->w + 2 * (X)->bw)
-#define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
-#define WTYPE                   "_NET_WM_WINDOW_TYPE_"
-#define TAGMASK                 ((1 << NUMTAGS) - 1)
-#define TEXTWM(X)               (drw_fontset_getwidth(drw, (X), True) + lrpad)
-#define TEXTW(X)                (drw_fontset_getwidth(drw, (X), False) + lrpad)
-#define HIDDEN(C)               ((getstate(C->win) == IconicState))
+#define Button6 6
+#define Button7 7
+#define Button8 8
+#define Button9 9
+#define NUMTAGS 9
+#define BARRULES 20
+#define BUTTONMASK (ButtonPressMask | ButtonReleaseMask)
+#define CLEANMASK(mask)                                                        \
+	(mask & ~(numlockmask | LockMask) &                                        \
+	 (ShiftMask | ControlMask | Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask |    \
+	  Mod5Mask))
+#define INTERSECT(x, y, w, h, m)                                               \
+	(MAX(0, MIN((x) + (w), (m)->wx + (m)->ww) - MAX((x), (m)->wx)) *           \
+	 MAX(0, MIN((y) + (h), (m)->wy + (m)->wh) - MAX((y), (m)->wy)))
+#define ISVISIBLE(C) ((C->tags & C->mon->tagset[C->mon->seltags]))
+#define LENGTH(X) (sizeof X / sizeof X[0])
+#define MOUSEMASK (BUTTONMASK | PointerMotionMask)
+#define WIDTH(X) ((X)->w + 2 * (X)->bw)
+#define HEIGHT(X) ((X)->h + 2 * (X)->bw)
+#define WTYPE "_NET_WM_WINDOW_TYPE_"
+#define TAGMASK ((1 << NUMTAGS) - 1)
+#define TEXTWM(X) (drw_fontset_getwidth(drw, (X), True) + lrpad)
+#define TEXTW(X) (drw_fontset_getwidth(drw, (X), False) + lrpad)
+#define HIDDEN(C) ((getstate(C->win) == IconicState))
 
 /* enums */
-enum {
-	CurNormal,
-	CurResize,
-	CurMove,
-	CurLast
-}; /* cursor */
+enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 
 enum {
 	SchemeNorm,
@@ -73,11 +70,23 @@ enum {
 }; /* color schemes */
 
 enum {
-	NetSupported, NetWMName, NetWMState, NetWMCheck,
-	NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-	NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation,
-	NetSystemTrayVisual, NetWMWindowTypeDock, NetSystemTrayOrientationHorz,
-	NetDesktopNames, NetDesktopViewport, NetNumberOfDesktops, NetCurrentDesktop,
+	NetSupported,
+	NetWMName,
+	NetWMState,
+	NetWMCheck,
+	NetWMFullscreen,
+	NetActiveWindow,
+	NetWMWindowType,
+	NetSystemTray,
+	NetSystemTrayOP,
+	NetSystemTrayOrientation,
+	NetSystemTrayVisual,
+	NetWMWindowTypeDock,
+	NetSystemTrayOrientationHorz,
+	NetDesktopNames,
+	NetDesktopViewport,
+	NetNumberOfDesktops,
+	NetCurrentDesktop,
 	NetClientList,
 	NetLast
 }; /* EWMH atoms */
@@ -89,7 +98,6 @@ enum {
 	WMTakeFocus,
 	WMLast
 }; /* default atoms */
-
 
 enum {
 	ClkTagBar,
@@ -115,7 +123,6 @@ enum {
 	BAR_ALIGN_LAST
 }; /* bar alignment */
 
-
 typedef union {
 	int i;
 	unsigned int ui;
@@ -136,8 +143,9 @@ struct Bar {
 	int borderpx;
 	int borderscheme;
 	int bx, by, bw, bh; /* bar geometry */
-	int w[BARRULES]; // width, array length == barrules, then use r index for lookup purposes
-	int x[BARRULES]; // x position, array length == ^
+	int w[BARRULES];	// width, array length == barrules, then use r index for
+						// lookup purposes
+	int x[BARRULES];	// x position, array length == ^
 };
 
 typedef struct {
@@ -156,7 +164,7 @@ typedef struct {
 	int (*clickfunc)(Bar *bar, Arg *arg, BarArg *a);
 	int (*hoverfunc)(Bar *bar, BarArg *a, XMotionEvent *ev);
 	char *name; // for debugging
-	int x, w; // position, width for internal use
+	int x, w;	// position, width for internal use
 } BarRule;
 
 typedef struct {
@@ -166,7 +174,6 @@ typedef struct {
 	void (*func)(const Arg *arg);
 	const Arg arg;
 } Button;
-
 
 typedef struct Client Client;
 struct Client {
@@ -192,20 +199,18 @@ typedef struct {
 	const Arg arg;
 } Key;
 
-
 typedef struct {
 	const char *symbol;
 	void (*arrange)(Monitor *);
 } Layout;
-
 
 struct Monitor {
 	char ltsymbol[16];
 	float mfact;
 	int nmaster;
 	int num;
-	int mx, my, mw, mh;   /* screen size */
-	int wx, wy, ww, wh;   /* window area  */
+	int mx, my, mw, mh; /* screen size */
+	int wx, wy, ww, wh; /* window area  */
 	unsigned int seltags;
 	unsigned int sellt;
 	unsigned int tagset[2];
@@ -228,7 +233,7 @@ typedef struct {
 	int monitor;
 } Rule;
 
-#define RULE(...) { .monitor = -1, __VA_ARGS__ },
+#define RULE(...) {.monitor = -1, __VA_ARGS__},
 
 /* Cross patch compatibility rule macro helper macros */
 #define FLOATING , .isfloating = 1
@@ -292,7 +297,8 @@ void resizemouse(const Arg *arg);
 void restack(Monitor *m);
 void run(void);
 void scan(void);
-int sendevent(Window w, Atom proto, int m, long d0, long d1, long d2, long d3, long d4);
+int sendevent(Window w, Atom proto, int m, long d0, long d1, long d2, long d3,
+			  long d4);
 void sendmon(Client *c, Monitor *m);
 void setclientstate(Client *c, long state);
 void setfocus(Client *c);
@@ -329,3 +335,16 @@ int xerror(Display *dpy, XErrorEvent *ee);
 int xerrordummy(Display *dpy, XErrorEvent *ee);
 int xerrorstart(Display *dpy, XErrorEvent *ee);
 void zoom(const Arg *arg);
+
+extern int ignoreconfigurerequests;
+extern int (*xerrorxlib)(Display *, XErrorEvent *);
+extern unsigned int numlockmask;
+extern void (*handler[LASTEvent])(XEvent *);
+extern Atom wmatom[WMLast], netatom[NetLast];
+extern int running;
+extern Cur *cursor[CurLast];
+extern Clr **scheme;
+extern Display *dpy;
+extern Drw *drw;
+extern Monitor *mons, *selmon;
+extern Window root, wmcheckwin;
