@@ -348,3 +348,5 @@ extern Display *dpy;
 extern Drw *drw;
 extern Monitor *mons, *selmon;
 extern Window root, wmcheckwin;
+extern const Layout layouts[];
+extern const int layouts_count;
