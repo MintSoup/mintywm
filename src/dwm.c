@@ -25,6 +25,7 @@
 
 #include "dwm.h"
 #include "guileintg.h"
+#include "keycodes.h"
 
 #include "../patch/include.h"
 #include <X11/Xlib.h>
@@ -955,14 +956,12 @@ void grabkeys(void) {
 		unsigned int i, j;
 		unsigned int modifiers[] = {0, LockMask, numlockmask,
 									numlockmask | LockMask};
-		KeyCode code;
 
 		XUngrabKey(dpy, AnyKey, AnyModifier, root);
 		for (i = 0; i < LENGTH(keys); i++)
-			if ((code = XKeysymToKeycode(dpy, keys[i].keysym)))
-				for (j = 0; j < LENGTH(modifiers); j++)
-					XGrabKey(dpy, code, keys[i].mod | modifiers[j], root, True,
-							 GrabModeAsync, GrabModeAsync);
+			for (j = 0; j < LENGTH(modifiers); j++)
+				XGrabKey(dpy, keys[i].keycode, keys[i].mod | modifiers[j], root,
+						 True, GrabModeAsync, GrabModeAsync);
 	}
 }
 
@@ -984,18 +983,13 @@ static int isuniquegeom(XineramaScreenInfo *unique, size_t n,
 
 void keypress(XEvent *e) {
 	unsigned int i;
-	int keysyms_return;
-	KeySym *keysym;
 	XKeyEvent *ev;
 
 	ev = &e->xkey;
-	keysym =
-		XGetKeyboardMapping(dpy, (KeyCode) ev->keycode, 1, &keysyms_return);
 	for (i = 0; i < LENGTH(keys); i++)
-		if (*keysym == keys[i].keysym &&
+		if (ev->keycode == keys[i].keycode &&
 			CLEANMASK(keys[i].mod) == CLEANMASK(ev->state) && keys[i].func)
 			keys[i].func(&(keys[i].arg));
-	XFree(keysym);
 }
 
 void killclient(const Arg *arg) {
