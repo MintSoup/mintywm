@@ -11,12 +11,7 @@
 #include "bar_wintitle.c"
 #include "bar_systray.c"
 
-/* Other patches */
-#include "cfacts.c"
-#include "moveresize.c"
-#include "movestack.c"
 /* Layouts */
 #include "layout_facts.c"
 #include "layout_monocle.c"
 #include "layout_tile.c"
-

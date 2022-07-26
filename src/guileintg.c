@@ -112,6 +112,16 @@ static SCM scm_focusmon(SCM arg) {
 	return SCM_UNSPECIFIED;
 }
 
+static SCM scm_movestack(SCM arg) {
+	movestack(&(Arg){.i = scm_to_int32(arg)});
+	return SCM_UNSPECIFIED;
+}
+
+static SCM scm_setcfact(SCM arg) {
+	setcfact(&(Arg){.f = scm_to_double(arg)});
+	return SCM_UNSPECIFIED;
+}
+
 static SCM scm_grab_key(SCM mod, SCM key) {
 	updatenumlockmask();
 	int modifier = scm_to_int32(mod);
@@ -158,6 +168,8 @@ static void register_core(void *args) {
 	reg_fn("inc-nmaster", 1, 0, 0, &scm_incnmaster);
 	reg_fn("focus-stack", 1, 0, 0, &scm_focusstack);
 	reg_fn("focus-mon", 1, 0, 0, &scm_focusmon);
+	reg_fn("set-cfact", 1, 0, 0, &scm_setcfact);
+	reg_fn("move-stack", 1, 0, 0, &scm_movestack);
 
 	reg_fn("zoom", 0, 0, 0, &scm_zoom);
 	reg_fn("toggle-floating", 0, 0, 0, &scm_togglefloating);
@@ -166,6 +178,7 @@ static void register_core(void *args) {
 	reg_fn("quit", 0, 0, 0, &scm_quit);
 	reg_fn("move-mouse", 0, 0, 0, &scm_movemouse);
 	reg_fn("kill-client", 0, 0, 0, &scm_killclient);
+
 
 	reg_fn("grab-key", 2, 0, 0, &scm_grab_key);
 	reg_fn("ungrab-key", 2, 0, 0, &scm_grab_key);

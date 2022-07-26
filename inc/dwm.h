@@ -244,6 +244,10 @@ typedef struct {
 #define TERMINAL
 #define SWITCHTAG
 
+void movestack(const Arg *arg);
+void moveresize(const Arg *arg);
+void setcfact(const Arg *arg);
+
 void applyrules(Client *c);
 int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
 void arrange(Monitor *m);

@@ -273,6 +273,10 @@
 	(grab-key modifiers keycode))
 
 
+(define-public (bind-key* modifiers keycode function . args)
+	(unbind-key modifiers keycode)
+	(apply bind-key modifiers keycode function args))
+
 (define-public (unbind-key modifiers keycode)
 	(set! key-binds
 		  (filter!
