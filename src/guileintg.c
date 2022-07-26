@@ -16,8 +16,18 @@ mintywm. If not, see <https://www.gnu.org/licenses/>.
 
 #include "dwm.h"
 #include "guileintg.h"
+#include "libguile/strings.h"
+#include "libguile/tags.h"
+#include <X11/Xlib.h>
 #include <libguile.h>
 #include <libguile/validate.h>
+#include <unistd.h>
+
+static SCM reg_fn(const char *name, int req, int opt, int rst, SCM (*fcn)()) {
+	SCM r = scm_c_define_gsubr(name, req, opt, rst, fcn);
+	scm_c_export(name);
+	return r;
+}
 
 static SCM scm_settitle(SCM str) {
 	int n = scm_to_locale_stringbuf(str, stext, sizeof(stext) - 1);
@@ -102,10 +112,38 @@ static SCM scm_focusmon(SCM arg) {
 	return SCM_UNSPECIFIED;
 }
 
-static SCM reg_fn(const char *name, int req, int opt, int rst, SCM (*fcn)()) {
-	SCM r = scm_c_define_gsubr(name, req, opt, rst, fcn);
-	scm_c_export(name);
-	return r;
+static SCM scm_grab_key(SCM mod, SCM key) {
+	updatenumlockmask();
+	int modifier = scm_to_int32(mod);
+	int kc = scm_to_int32(key);
+
+	unsigned int modifiers[] = {0, LockMask, numlockmask,
+								numlockmask | LockMask};
+
+	for (int i = 0; i < LENGTH(modifiers); i++)
+		XGrabKey(dpy, kc, modifier | modifiers[i], root, True, GrabModeAsync,
+				 GrabModeAsync);
+
+	return SCM_UNSPECIFIED;
+}
+
+static SCM scm_ungrab_key(SCM mod, SCM key) {
+
+	int modifier = scm_to_int32(mod);
+	int kc = scm_to_int32(key);
+
+	unsigned int modifiers[] = {0, LockMask, numlockmask,
+								numlockmask | LockMask};
+
+	for (int i = 0; i < LENGTH(modifiers); i++)
+		XUngrabKey(dpy, kc, modifier | modifiers[i], root);
+
+	return SCM_UNSPECIFIED;
+}
+
+static SCM scm_ungrab_all_keys() {
+	XUngrabKey(dpy, AnyKey, AnyModifier, root);
+	return SCM_UNSPECIFIED;
 }
 
 static void register_core(void *args) {
@@ -121,7 +159,6 @@ static void register_core(void *args) {
 	reg_fn("focus-stack", 1, 0, 0, &scm_focusstack);
 	reg_fn("focus-mon", 1, 0, 0, &scm_focusmon);
 
-
 	reg_fn("zoom", 0, 0, 0, &scm_zoom);
 	reg_fn("toggle-floating", 0, 0, 0, &scm_togglefloating);
 	reg_fn("toggle-bar", 0, 0, 0, &scm_togglebar);
@@ -130,12 +167,15 @@ static void register_core(void *args) {
 	reg_fn("move-mouse", 0, 0, 0, &scm_movemouse);
 	reg_fn("kill-client", 0, 0, 0, &scm_killclient);
 
+	reg_fn("grab-key", 2, 0, 0, &scm_grab_key);
+	reg_fn("ungrab-key", 2, 0, 0, &scm_grab_key);
+	reg_fn("ungrab-all-keys", 0, 0, 0, &scm_ungrab_all_keys);
+
 	scm_primitive_load(scm_from_locale_string("guile/core.scm"));
 }
 
 static void *init(void *data) {
 	SCM mod = scm_c_define_module("mintywm core", register_core, NULL);
-
 	scm_c_eval_string_in_module("(load-user-config-file \"init.scm\")", mod);
 	return NULL;
 }

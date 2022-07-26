@@ -123,7 +123,6 @@
 #define XKCD_Super_R 134
 #define XKCD_Menu 135
 #define XKCD_Cancel 136
-#define XKCD_Redo 137
 #define XKCD_SunProps 138
 #define XKCD_Undo 139
 #define XKCD_SunFront 140
@@ -160,7 +159,6 @@
 #define XKCD_XF86AudioRecord 175
 #define XKCD_XF86AudioRewind 176
 #define XKCD_XF86Phone 177
-#define XKCD_XF86Tools 179
 #define XKCD_XF86HomePage 180
 #define XKCD_XF86Reload 181
 #define XKCD_XF86Close 182
@@ -169,8 +167,6 @@
 #define XKCD_parenleft 187
 #define XKCD_parenright 188
 #define XKCD_XF86New 189
-#define XKCD_Redo 190
-#define XKCD_XF86Tools 191
 #define XKCD_XF86Launch5 192
 #define XKCD_XF86Launch6 193
 #define XKCD_XF86Launch7 194

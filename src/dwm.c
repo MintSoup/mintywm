@@ -950,21 +950,6 @@ void grabbuttons(Client *c, int focused) {
 	}
 }
 
-void grabkeys(void) {
-	updatenumlockmask();
-	{
-		unsigned int i, j;
-		unsigned int modifiers[] = {0, LockMask, numlockmask,
-									numlockmask | LockMask};
-
-		XUngrabKey(dpy, AnyKey, AnyModifier, root);
-		for (i = 0; i < LENGTH(keys); i++)
-			for (j = 0; j < LENGTH(modifiers); j++)
-				XGrabKey(dpy, keys[i].keycode, keys[i].mod | modifiers[j], root,
-						 True, GrabModeAsync, GrabModeAsync);
-	}
-}
-
 void incnmaster(const Arg *arg) {
 	selmon->nmaster = MAX(selmon->nmaster + arg->i, 0);
 	arrange(selmon);
@@ -981,15 +966,17 @@ static int isuniquegeom(XineramaScreenInfo *unique, size_t n,
 }
 #endif /* XINERAMA */
 
-void keypress(XEvent *e) {
-	unsigned int i;
-	XKeyEvent *ev;
+void *scm_keypress(void *data) {
+	XKeyEvent *ev = data;
+	SCM kp = scm_c_private_ref("mintywm keys", "key-press");
+	scm_call_2(kp, scm_from_int32(ev->keycode),
+			   scm_from_int32(CLEANMASK(ev->state)));
+	return NULL;
+}
 
-	ev = &e->xkey;
-	for (i = 0; i < LENGTH(keys); i++)
-		if (ev->keycode == keys[i].keycode &&
-			CLEANMASK(keys[i].mod) == CLEANMASK(ev->state) && keys[i].func)
-			keys[i].func(&(keys[i].arg));
+void keypress(XEvent *e) {
+	XKeyEvent *ev = &e->xkey;
+	scm_with_guile(&scm_keypress, ev);
 }
 
 void killclient(const Arg *arg) {
@@ -1089,10 +1076,7 @@ void manage(Window w, XWindowAttributes *wa) {
 
 void mappingnotify(XEvent *e) {
 	XMappingEvent *ev = &e->xmapping;
-
 	XRefreshKeyboardMapping(ev);
-	if (ev->request == MappingKeyboard)
-		grabkeys();
 }
 
 void maprequest(XEvent *e) {
@@ -1654,7 +1638,6 @@ void setup(void) {
 					LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
 	XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
-	grabkeys();
 	focus(NULL);
 
 	/* init guile */

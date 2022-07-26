@@ -220,54 +220,6 @@ static const char *dmenucmd[] = {
 };
 static const char *termcmd[]  = { "st", NULL };
 
-static Key keys[] = {
-	/* modifier                     key            function                argument */
-	{ MODKEY,                       XKCD_space,      spawn,                  {.v = dmenucmd } },
-	{ MODKEY,                       XKCD_Return,     spawn,                  {.v = termcmd } },
-	{ MODKEY,                       XKCD_b,          togglebar,              {0} },
-	{ MODKEY,                       XKCD_j,          focusstack,             {.i = +1 } },
-	{ MODKEY,                       XKCD_k,          focusstack,             {.i = -1 } },
-	{ MODKEY,                       XKCD_i,          incnmaster,             {.i = +1 } },
-	{ MODKEY,                       XKCD_d,          incnmaster,             {.i = -1 } },
-	{ MODKEY,                       XKCD_h,          setmfact,               {.f = -0.05} },
-	{ MODKEY,                       XKCD_l,          setmfact,               {.f = +0.05} },
-	{ MODKEY|ShiftMask,             XKCD_h,          setcfact,               {.f = +0.25} },
-	{ MODKEY|ShiftMask,             XKCD_l,          setcfact,               {.f = -0.25} },
-	{ MODKEY|ShiftMask,             XKCD_o,          setcfact,               {0} },
-	{ MODKEY|Mod4Mask,              XKCD_Down,       moveresize,             {.v = "0x 25y 0w 0h" } },
-	{ MODKEY|Mod4Mask,              XKCD_Up,         moveresize,             {.v = "0x -25y 0w 0h" } },
-	{ MODKEY|Mod4Mask,              XKCD_Right,      moveresize,             {.v = "25x 0y 0w 0h" } },
-	{ MODKEY|Mod4Mask,              XKCD_Left,       moveresize,             {.v = "-25x 0y 0w 0h" } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XKCD_Down,       moveresize,             {.v = "0x 0y 0w 25h" } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XKCD_Up,         moveresize,             {.v = "0x 0y 0w -25h" } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XKCD_Right,      moveresize,             {.v = "0x 0y 25w 0h" } },
-	{ MODKEY|Mod4Mask|ShiftMask,    XKCD_Left,       moveresize,             {.v = "0x 0y -25w 0h" } },
-	{ MODKEY|ShiftMask,             XKCD_j,          movestack,              {.i = +1 } },
-	{ MODKEY|ShiftMask,             XKCD_k,          movestack,              {.i = -1 } },
-	{ MODKEY,                       XKCD_Tab,        view,                   {0} },
-	{ MODKEY,                       XKCD_x,          killclient,             {0} },
-	{ MODKEY|ShiftMask,             XKCD_q,          quit,                   {0} },
-	{ MODKEY,                       XKCD_t,          setlayout,              {.v = &layouts[0]} },
-	{ MODKEY,                       XKCD_f,          setlayout,              {.v = &layouts[1]} },
-	{ MODKEY,                       XKCD_m,          setlayout,              {.v = &layouts[2]} },
-	{ MODKEY|ShiftMask,             XKCD_space,      togglefloating,         {0} },
-	{ MODKEY,                       XKCD_0,          view,                   {.ui = ~0 } },
-	{ MODKEY|ShiftMask,             XKCD_0,          tag,                    {.ui = ~0 } },
-	{ MODKEY,                       XKCD_comma,      focusmon,               {.i = -1 } },
-	{ MODKEY,                       XKCD_period,     focusmon,               {.i = +1 } },
-	{ MODKEY|ShiftMask,             XKCD_comma,      tagmon,                 {.i = -1 } },
-	{ MODKEY|ShiftMask,             XKCD_period,     tagmon,                 {.i = +1 } },
-	TAGKEYS(                        XKCD_1,                                  0)
-	TAGKEYS(                        XKCD_2,                                  1)
-	TAGKEYS(                        XKCD_3,                                  2)
-	TAGKEYS(                        XKCD_4,                                  3)
-	TAGKEYS(                        XKCD_5,                                  4)
-	TAGKEYS(                        XKCD_6,                                  5)
-	TAGKEYS(                        XKCD_7,                                  6)
-	TAGKEYS(                        XKCD_8,                                  7)
-	TAGKEYS(                        XKCD_9,                                  8)
-};
-
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
