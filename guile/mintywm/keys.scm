@@ -24,6 +24,7 @@
 	#:use-module (al plists)
 	#:use-module (mintywm core))
 
+;; List of functions to be called before and after a key press
 (define-public before-keypress-functions '())
 (define-public after-keypress-functions '())
 
@@ -267,6 +268,8 @@
 			 f ...)]))
 
 (define-public (bind-key modifiers keycode function . args)
+	"Add a keybinding on KEYCODE with MODIFIERS.
+FUNCTION will be called with ARGS when the key is pressed."
 	(set! key-binds
 		  (cons (apply make-key-plist modifiers keycode function args)
 				key-binds))
@@ -274,10 +277,13 @@
 
 
 (define-public (bind-key* modifiers keycode function . args)
+	"Equivalent to bind-key, but removes all previous keybindings
+on KEYCODE with MODIFIERS beforehand."
 	(unbind-key modifiers keycode)
 	(apply bind-key modifiers keycode function args))
 
 (define-public (unbind-key modifiers keycode)
+	"Remove all keybindings on KEYCODE with MODIFIERS"
 	(set! key-binds
 		  (filter!
 		   (lambda (pl)
