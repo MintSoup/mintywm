@@ -13,7 +13,6 @@ MintyWM is a dynamic X11 window manager. Conceptually, it is dwm with Guile supp
 Coming soo  n
 
 * Motivation
-** Why?
 I personally really like the way dwm manages windows, but I have four main issues with it:
 1. You have to recompile it every time you want to make any change. It's not a dealbreaker but it gets annoying, especially compared to lispy programs where you can just re-evaluate and instantly see the changes appear.
 2. C is a very low-level language, and while that makes it fast, writing more complex features takes lots of time and lines of code.
@@ -22,11 +21,12 @@ I personally really like the way dwm manages windows, but I have four main issue
 
 This project aims to fix all these issues and create my perfect window manager.
 
-*** Why not Awesome?
+** Why not Awesome?
 Awesome is a fine window manager and I am actually using it right now. Overall, the idea of Awesome is great but the development has really stagnated and there are many annoying bugs in the code. I would have continued using it if it weren't for the handful of rough corners.
 
 ** Why Guile?
 I chose Guile for the scripting language because it is a rare example of a good implementation of a well-designed language. It's expressive, high level, and very interactive/dynamic. Having a REPL is a godsend while you're tweaking small things because at no point do you have to reload (or recompile the program).
+
 ** Why dwm?
 Initially, I wanted to write the entire WM in pure Guile, but chose to fork dwm for a few reasons:
 1. dwm provides a solid base and stops me from having to reinvent the wheel a bunch of times.
@@ -38,3 +38,4 @@ Initially, I wanted to write the entire WM in pure Guile, but chose to fork dwm 
 + Be as flexible as possible without going the AwesomeWM route of being able to emulate every other window manager in existence.
 + If a feature can be implemented in Guile, it should be implemented in Guile.
 + Complexity is not inherently bad: if a highly beneficial change requires us to introduce a little complexity, so be it.
+  
